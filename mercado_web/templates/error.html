@@ -1,0 +1,3 @@
+{% extends 'base.html' %}
+{% block title %}Erro {{ code }} | {{ store_name }}{% endblock %}
+{% block content %}<section class="empty-state error-state container"><span class="error-code">{{ code }}</span><h1>Ops, essa página escapou do carrinho.</h1><p>{{ message }}</p><a class="btn btn-green" href="{{ url_for('index') }}">Voltar ao início</a></section>{% endblock %}

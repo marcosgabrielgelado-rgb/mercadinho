@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}{{ store_name }} | Produtos e ofertas{% endblock %}
+{% block content %}
+<section class="hero-wrap">
+  <div class="hero container">
+    <div class="hero-copy">
+      <span class="eyebrow"><span class="eyebrow-dot"></span> BOM DE VER, MELHOR DE PAGAR</span>
+      <h1>Seu mercado.<br><span>Suas melhores</span> escolhas.</h1>
+      <p>{{ store_tagline }} Produtos selecionados, preços transparentes e ofertas para deixar a compra mais leve.</p>
+      <div class="hero-actions">
+        <a class="btn btn-light" href="#catalogo">Ver produtos <span aria-hidden="true">↘</span></a>
+        <a class="hero-text-link" href="{{ url_for('index', ofertas=1) }}">Explorar ofertas <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="hero-proof"><span class="proof-icon">✓</span><span><strong>Preço na etiqueta, sem surpresa.</strong><small>Consulte as ofertas disponíveis.</small></span></div>
+    </div>
+    <div class="hero-art" aria-label="Ilustração de sacola de compras com alimentos">
+      <div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div>
+      <div class="hero-blob"></div>
+      <div class="floating-note note-top"><span>✦</span><div><strong>Oferta fresquinha</strong><small>Todo dia tem novidade</small></div></div>
+      <div class="grocery-bag"><div class="bag-handle"></div><div class="bag-front"><span class="bag-leaf leaf-a"></span><span class="bag-leaf leaf-b"></span><span class="bag-mark">✳</span></div></div>
+      <div class="fruit fruit-orange">●</div><div class="fruit fruit-apple">●</div><div class="fruit fruit-leaf">✦</div>
+      <div class="floating-note note-bottom"><span class="note-spark">↗</span><div><strong>{{ offers_count }} ofertas</strong><small>esperando por você</small></div></div>
+      <div class="art-caption">FRESCO <span>•</span> LOCAL <span>•</span> DO SEU JEITO</div>
+    </div>
+  </div>
+</section>
+
+<section class="benefits container" aria-label="Vantagens">
+  <div class="benefit"><span class="benefit-icon green">♧</span><div><strong>Fresquinho todo dia</strong><small>Seleção feita com cuidado</small></div></div>
+  <div class="benefit"><span class="benefit-icon yellow">％</span><div><strong>Ofertas de verdade</strong><small>Preço antigo e novo à vista</small></div></div>
+  <div class="benefit"><span class="benefit-icon pink">♡</span><div><strong>Feito para você</strong><small>O essencial mais perto</small></div></div>
+</section>
+
+<section class="catalog-section container" id="catalogo">
+  <div class="section-heading">
+    <div><span class="section-kicker">DA NOSSA PRATELEIRA</span><h2>Encontre o que precisa<span class="heading-period">.</span></h2><p>Uma seleção do dia, com preço claro e sem caça ao tesouro.</p></div>
+    <div class="catalog-count"><strong>{{ products|length }}</strong><span>produto{% if products|length != 1 %}s{% endif %}<br>encontrado{% if products|length != 1 %}s{% endif %}</span></div>
+  </div>
+
+  <form class="catalog-tools" method="get" action="{{ url_for('index') }}" id="filters-form">
+    <label class="search-box"><span class="search-icon">⌕</span><input type="search" name="q" value="{{ search }}" placeholder="Buscar arroz, café, frutas..." aria-label="Buscar produtos"><button type="submit" class="search-submit">Buscar</button></label>
+    {% if only_offers %}<input type="hidden" name="ofertas" value="1">{% endif %}
+    <div class="filter-select-wrap"><span class="filter-icon">☷</span><select name="categoria" aria-label="Filtrar por categoria" onchange="this.form.submit()"><option value="">Todas as categorias</option>{% for item in categories %}<option value="{{ item.category }}" {% if selected_category == item.category %}selected{% endif %}>{{ item.category }}</option>{% endfor %}</select></div>
+  </form>
+  <div class="category-pills">
+    <a class="category-pill {% if not selected_category and not only_offers %}selected{% endif %}" href="{{ url_for('index') }}">Todos os produtos</a>
+    <a class="category-pill {% if only_offers %}selected offer-pill{% endif %}" href="{{ url_for('index', ofertas=1) }}"><span>✦</span> Ofertas <span class="pill-count">{{ offers_count }}</span></a>
+    {% for item in categories %}<a class="category-pill {% if selected_category == item.category %}selected{% endif %}" href="{{ url_for('index', categoria=item.category) }}">{{ item.category }}</a>{% endfor %}
+  </div>
+
+  {% if products %}
+  <div class="product-grid">
+    {% for product in products %}
+    <article class="product-card">
+      <div class="product-photo-wrap">
+        {% if product.old_price and product.old_price > product.price %}<span class="sale-badge">-{{ product.old_price|discount(product.price) }}%</span>{% endif %}
+        {% if product.featured %}<span class="featured-badge">Escolha da casa</span>{% endif %}
+        {% if image_for(product) %}<img class="product-photo" src="{{ image_for(product) }}" alt="{{ product.name }}" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><div class="product-photo-fallback" hidden><span>✳</span></div>{% else %}<div class="product-photo-fallback"><span>✳</span></div>{% endif %}
+      </div>
+      <div class="product-info">
+        <div class="product-meta"><span>{{ product.category }}</span>{% if product.brand %}<span>·</span><span>{{ product.brand }}</span>{% endif %}</div>
+        <h3>{{ product.name }}</h3>
+        {% if product.description %}<p class="product-description">{{ product.description }}</p>{% endif %}
+        <div class="product-bottom">
+          <div class="price-block">{% if product.old_price and product.old_price > product.price %}<span class="old-price">{{ product.old_price|brl }}</span>{% endif %}<div class="current-price">{{ product.price|brl }}<small> / {{ product.unit }}</small></div></div>
+          <span class="product-plus" aria-label="Produto disponível">↗</span>
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+    <div class="empty-state"><span class="empty-icon">⌕</span><h3>Nenhum produto por aqui</h3><p>Tente outra busca ou limpe os filtros. Até as prateleiras têm limites.</p><a class="btn btn-green" href="{{ url_for('index') }}">Limpar filtros</a></div>
+  {% endif %}
+</section>
+
+<section class="promo-banner container">
+  <div class="promo-icon">✦</div><div><span class="section-kicker">OFERTAS QUE VALEM A VISITA</span><h2>Economia boa é economia visível.</h2><p>Confira os produtos em oferta e aproveite enquanto durarem os estoques.</p></div><a class="btn btn-green" href="{{ url_for('index', ofertas=1) }}">Ver ofertas <span aria-hidden="true">→</span></a>
+</section>
+{% endblock %}

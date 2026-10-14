@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Identidade da loja | {{ store_name }}{% endblock %}
+{% block content %}
+<section class="admin-page container form-page settings-page">
+  <div class="breadcrumb"><a href="{{ url_for('admin_dashboard') }}">← Painel</a><span>/</span><span>Identidade da loja</span></div>
+  <div class="form-page-heading"><div><span class="section-kicker">PERSONALIZAÇÃO</span><h1>Identidade da loja<span class="heading-period">.</span></h1><p>Esses textos aparecem no topo, no banner e no rodapé do catálogo.</p></div></div>
+  <form method="post" class="settings-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><section class="editor-panel"><div class="form-stack"><label>Nome do supermercado<input name="store_name" required maxlength="70" value="{{ settings.store_name }}" placeholder="Ex.: Mercado do Bairro"></label><label>Frase principal<input name="store_tagline" maxlength="120" value="{{ settings.store_tagline }}" placeholder="Ex.: Preço bom é aqui. Todo dia."></label><label>Aviso do rodapé<input name="store_notice" maxlength="180" value="{{ settings.store_notice }}" placeholder="Ex.: Ofertas válidas enquanto durarem os estoques."></label></div><div class="settings-actions"><a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline">Cancelar</a><button class="btn btn-green" type="submit">Salvar identidade <span>→</span></button></div></section></form>
+</section>
+{% endblock %}
